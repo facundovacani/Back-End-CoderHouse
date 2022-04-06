@@ -5,16 +5,16 @@ const app = express();
 const PORT = 8080;
 
 const archivo = new Contenedor("./productos.json");
-// archivo.save({
-//     title: "Heladera",
-//     price: 80,
-//     thumbnail: "https://www.nnet.com.uy/productos/imgs/heladera-james-2-puertas-c-freezer-502-litros-inox-nnet-54511-34.jpg"
-// })
-// archivo.save({
-//     title: "Auto",
-//     price: 32000,
-//     thumbnail: "https://elcomercio.pe/resizer/8RXQNJCo8HwHuVOJCiqYMDZSU3I=/1200x800/smart/filters:format(jpeg):quality(75)/arc-anglerfish-arc2-prod-elcomercio.s3.amazonaws.com/public/C4HT4KUZVFECDIGTAMLGVZAV34.jpg"
-// })
+archivo.save({
+    title: "Heladera",
+    price: 80,
+    thumbnail: "https://www.nnet.com.uy/productos/imgs/heladera-james-2-puertas-c-freezer-502-litros-inox-nnet-54511-34.jpg"
+})
+archivo.save({
+    title: "Auto",
+    price: 32000,
+    thumbnail: "https://elcomercio.pe/resizer/8RXQNJCo8HwHuVOJCiqYMDZSU3I=/1200x800/smart/filters:format(jpeg):quality(75)/arc-anglerfish-arc2-prod-elcomercio.s3.amazonaws.com/public/C4HT4KUZVFECDIGTAMLGVZAV34.jpg"
+})
 
 const server = app.listen(PORT, ()=>{
     console.log(`Escuchando servidor desde el puerto ${server.address().port}`);
@@ -33,7 +33,7 @@ app.get("/productos", async (req,res)=>{
 
 app.get("/productoRandom", async (req,res)=>{
     let array = await archivo.getAll();
-    let random = parseInt(Math.random() * 10);
+    let random = parseInt(Math.random() * array.length);
     if(array.length >= random && random > 0){
         random = random; 
     }else if(random === 0){

@@ -59,6 +59,30 @@
       "price": 32000,
       "thumbnail": "https://elcomercio.pe/resizer/8RXQNJCo8HwHuVOJCiqYMDZSU3I=/1200x800/smart/filters:format(jpeg):quality(75)/arc-anglerfish-arc2-prod-elcomercio.s3.amazonaws.com/public/C4HT4KUZVFECDIGTAMLGVZAV34.jpg",
       "id": 10
+    },
+    {
+      "title": "Heladera",
+      "price": 80,
+      "thumbnail": "https://www.nnet.com.uy/productos/imgs/heladera-james-2-puertas-c-freezer-502-litros-inox-nnet-54511-34.jpg",
+      "id": 11
+    },
+    {
+      "title": "Auto",
+      "price": 32000,
+      "thumbnail": "https://elcomercio.pe/resizer/8RXQNJCo8HwHuVOJCiqYMDZSU3I=/1200x800/smart/filters:format(jpeg):quality(75)/arc-anglerfish-arc2-prod-elcomercio.s3.amazonaws.com/public/C4HT4KUZVFECDIGTAMLGVZAV34.jpg",
+      "id": 12
+    },
+    {
+      "title": "Heladera",
+      "price": 80,
+      "thumbnail": "https://www.nnet.com.uy/productos/imgs/heladera-james-2-puertas-c-freezer-502-litros-inox-nnet-54511-34.jpg",
+      "id": 13
+    },
+    {
+      "title": "Auto",
+      "price": 32000,
+      "thumbnail": "https://elcomercio.pe/resizer/8RXQNJCo8HwHuVOJCiqYMDZSU3I=/1200x800/smart/filters:format(jpeg):quality(75)/arc-anglerfish-arc2-prod-elcomercio.s3.amazonaws.com/public/C4HT4KUZVFECDIGTAMLGVZAV34.jpg",
+      "id": 14
     }
   ]
 }
