@@ -11,27 +11,44 @@ class Contenedor{
     }
 
     save(objeto){
-        let data = fs.readFileSync(this._archivo, "utf-8");
-        let array = JSON.parse(data).productos;
-        let id;
-        if(array.length === 0){
-            id = 1;
-        }else{
-            id = array[array.length-1].id + 1;
-        }
-        let nuevoObjeto = {
-            ...objeto,
-            id : id
-        };
-        array.push(nuevoObjeto);
         try{            
+            let data = fs.readFileSync(this._archivo, "utf-8");
+            let array = JSON.parse(data).productos;
+            let id;
+            if(array.length === 0){
+                id = 1;
+            }else{
+                id = array[array.length-1].id + 1;
+            }
+            let nuevoObjeto = {
+                ...objeto,
+                id : id
+            };
+            array.push(nuevoObjeto);
             fs.writeFileSync(this._archivo , JSON.stringify({productos: array}, null, 2));
-            console.log(`El id del objeto ${nuevoObjeto.title} es: ${nuevoObjeto.id}`);
+            return(`El id del objeto ${nuevoObjeto.title} es: ${nuevoObjeto.id}`);
         }catch(err){
             console.warn(err);
         }
     }
+    async putById(id,price){
+        try{
+            let data = await fs.promises.readFile(this._archivo, "utf-8");
+            let array = JSON.parse(data).productos;
+            let bool = array.some(i => i.id == id);
+            if(bool){
+                let index = array.findIndex(i => i.id == id);
+                array[index].price = price;
+                await fs.promises.writeFile(this._archivo , JSON.stringify({productos: array}));  
+                return {result: `Se cambio el precio al item ${array[index].title} con el id ${array[index].id} a ${price}`};
+            }else{
+                return { error : 'producto no encontrado' }
+            }
+        }catch(err){
+            console.warn(err)
 
+        }
+    }
     async getById(id){
         try{
             let data = await fs.promises.readFile(this._archivo, "utf-8");
@@ -41,7 +58,7 @@ class Contenedor{
                 let item = array.find(i => i.id == id);
                 return item;
             }else{
-                console.log(null);
+                return { error : 'producto no encontrado' }
             }
         }catch(err){
             console.warn(err)
@@ -70,11 +87,10 @@ class Contenedor{
                 let item = array.findIndex(i => i.id == id);
                 console.log(`Se eliminó el producto ${array[item].title} con id ${array[item].id}`)
                 array.splice(item, 1);
-                await fs.promises.writeFile(this._archivo , JSON.stringify({productos: array}));
-        
-               
+                await fs.promises.writeFile(this._archivo , JSON.stringify({productos: array}));  
+                return ({result:"Producto Eliminado"});             
             }else{
-                console.log(`No existe el id ${id} en la lista de productos`)
+                return({ error : 'producto no encontrado' })
             }
 
         }
