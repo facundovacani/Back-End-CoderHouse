@@ -1,5 +1,6 @@
 const $submit = document.querySelector('input[type="submit"]');
 console.log($submit)
+console.log("hola")
 const $title = document.querySelector('input[type="text"]');
 const $price = document.querySelector('input[type="number"]');
 const $thumbnail =  document.querySelector('input[type="url"]');
@@ -17,5 +18,6 @@ $form.addEventListener("submit", (e)=>{
 
     }else{
         $form.submit();
+
     }      
 })

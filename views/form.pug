@@ -1,0 +1,17 @@
+html
+    include partials/head.pug
+    body 
+        main 
+            include partials/nav.pug  
+            h2 Ingreso de Productos
+            form(id="formulario" method="POST" action="/api/productos") 
+                label Titulo: 
+                    input(placeholder="Titulo" type="text" name="title")
+                label Precio: 
+                    input(placeholder="Precio" type="number" name="price")
+                label Foto: 
+                    input(placeholder="Foto" type="url" name="thumbnail")
+                input(type="submit" value="Guardar Producto")
+            span 
+        script
+            include partials/index.js

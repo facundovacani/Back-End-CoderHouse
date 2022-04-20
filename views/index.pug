@@ -1,0 +1,25 @@
+html
+    include partials/head.pug
+    body 
+        main 
+            include partials/nav.pug  
+            h2 Vista de Productos
+            if listaExiste
+                table 
+                    thead 
+                        tr 
+                            th Nombre
+                            th Precio
+                            th Imagen
+                    tbody
+                        each product in productos
+                            tr 
+                                td=product.title 
+                                td=`USD ${product.price}`
+                                td
+                                    img(
+                                        src=product.thumbnail
+                                        alt=product.title) 
+            else 
+                h3 No hay Productos
+
