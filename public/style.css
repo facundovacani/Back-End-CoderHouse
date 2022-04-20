@@ -95,8 +95,12 @@ table > tbody tr td img{
 table tr{
     height: 110px;
 }
-table tr:nth-child(){}
-table td{
+table tr:nth-child(odd){
+    background-color: #babcbe;
+}
+table tr:nth-child(even){
+    background-color: #fff0f0;
+}table td{
     border: 1px solid rgba(255, 0, 0, 0.87);
     width: 33%;
 
@@ -139,10 +143,10 @@ label input{
 }
 form > input {
     width: 150px;
-    background-color: greenyellow;
+    background-color: #130fe4d7;
     height: 50px;
     font-weight: 600;
-    color: #130fe4d7;
+    color: greenyellow;
     border: 1px solid red;
     border-radius: 5px;
     -webkit-border-radius: 5px;
