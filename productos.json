@@ -11,6 +11,12 @@
       "price": "2000",
       "thumbnail": "https://www.nitro-pc.es/blog/wp-content/uploads/2017/11/elite-1.png",
       "id": 2
+    },
+    {
+      "title": "Mario Bros",
+      "price": "20",
+      "thumbnail": "https://i.blogs.es/638318/super_mario_bros_logo/450_1000.jpeg",
+      "id": 3
     }
   ]
 }
