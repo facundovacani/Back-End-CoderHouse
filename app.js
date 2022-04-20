@@ -5,53 +5,47 @@ const app = express();
 const PORT = 8080;
 const router = Router();
 
+const archivo = new Contenedor("./productos.json");
 
 
 app.use(express.json());
 app.use(express.urlencoded({extended:true}));
-app.use("/static", express.static(__dirname + "/public"));
+app.use("/static", express.static(__dirname + "/public/"));
 app.use("/api", router);
 
+// app.set("views", "./views")
+app.set("view engine", "ejs")
 
-app.get("/", (req, res)=>{
-    res.sendFile(__dirname + "/public/index.html")
+router.get("/",async (req,res)=>{
+    res.render("pages/form.ejs")
 })
-router.get("/productos",async (req,res)=>{
-    let array = await archivo.getAll();
-    res.json(array)
+
+router.get("/productos", async(req, res)=>{
+    let lista = await archivo.getAll();
+    let existe;
+    if(lista.length > 0){
+        existe = true;
+    }else{
+        existe = false
+    }
+    res.render("pages/index", {
+        productos: lista,
+        listaExiste: existe 
+    })
 })
-router.get("/productos/:id", async(req,res) =>{
-    let id = req.params.id;
-    let producto = await archivo.getById(id);
-    res.json(producto);
-})
+
+
 router.post("/productos", async(req,res)=>{
     let producto = {
         title: req.body.title,
         price: req.body.price,
         thumbnail: req.body.thumbnail
         }
-    let productoId = archivo.save(producto);
-    let lista = await archivo.getAll();
-    console.log(productoId); // Agregue esto, ya que mostraría el mensaje del return del método save. Para que en la consola notifique el ide del nuevo producto.
-    let productoFinal = lista[lista.length-1]
-    res.json(productoFinal);
+    archivo.save(producto);
+    res.render("pages/form.ejs");
 
 })
-router.put("/productos/:id", async(req,res)=>{
-    let id = req.params.id;
-    let precio = req.body.precio;
-    let producto = await archivo.putById(id,precio);
-    res.json(producto)
 
-})
-router.delete("/productos/:id", async(req,res)=>{
-    let id = req.params.id;
-    let eliminado = await archivo.deleteById(id);
-    res.json(eliminado);
-
-})
-const archivo = new Contenedor("./productos.json");
 // archivo.save({
 //     title: "Heladera",
 //     price: 80,
@@ -68,30 +62,3 @@ const server = app.listen(PORT, ()=>{
 })
 
 server.on("error", error => console.log(`Error: ${error}`))
-
-app.get("/productos", async (req,res)=>{
-    // let html = "<h1>Productos</h1><ul style='width:50%;min-width:350px; margin: 0 auto;display:flex; flex-direction:column; justify-content:center; align-items:center;'>";
-    let array = await archivo.getAll();
-    // array.forEach(item => html +=`<li style='display:flex; justify-content:center; align-items:center; height:100%;min-height:140px;'>${item.title} de id ${item.id} - precio: ${item.price} <img src="${item.thumbnail}" style="width:100px; height:100px"></li>`)
-    // html += "</ul>"
-
-    res.json(array)
-})
-
-app.get("/productoRandom", async (req,res)=>{
-    let array = await archivo.getAll();
-    let producto = array[Math.floor(Math.random() * array.length)]; // Metodo de pamela, mucho más efectivo.
-    // let random = parseInt(Math.random() * array.length);
-    // if(array.length >= random && random > 0){
-    //     random = random; 
-    // }else if(random === 0){
-    //     random = 1;
-    // }else{
-    //     random = array.length;
-    // }
-    // if(await archivo.getById(random) == null){
-    //     random = 1;
-    // }
-    // let producto = await archivo.getById(random);
-    res.json(producto)
-})

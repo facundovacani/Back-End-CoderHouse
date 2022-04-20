@@ -26,7 +26,7 @@ class Contenedor{
             };
             array.push(nuevoObjeto);
             fs.writeFileSync(this._archivo , JSON.stringify({productos: array}, null, 2));
-            return(`El id del objeto ${nuevoObjeto.title} es: ${nuevoObjeto.id}`);
+            return nuevoObjeto.id;
         }catch(err){
             console.warn(err);
         }

@@ -1,0 +1,18 @@
+<table>
+    <thead>
+        <tr>
+            <th>Nombre</th>
+            <th>Precio</th>
+            <th>Imagen</th>
+        </tr>
+    </thead>
+    <tbody>
+        <% productos.forEach(function(product) {%> 
+            <tr>
+                <td><%= product.title %> </td>
+                <td>USD <%= product.price %></td>
+                <td><img alt="<%= product.title %>" src="<%= product.thumbnail%> " /></td>
+            </tr>
+        <% }); %> 
+    </tbody>
+</table>

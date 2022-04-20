@@ -1,0 +1,19 @@
+<!DOCTYPE html>
+<html lang="es">
+    <head>
+        <%- include("../partials/head.ejs"); %> 
+    </head>
+    <body class="container">
+        
+        <main>
+            <%- include("../partials/header.ejs"); %>
+            <h2>Vista de Productos </h2>
+            <% if(listaExiste){ %> 
+                <%- include("../partials/productos.ejs"); %>
+            <% }else{ %> 
+                <h3>No hay Productos</h3>
+            <% } %> 
+                
+        </main>
+    </body>
+</html>

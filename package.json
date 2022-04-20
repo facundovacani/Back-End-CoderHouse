@@ -9,6 +9,7 @@
   "author": "FacuVacani",
   "license": "ISC",
   "devDependencies": {
+    "ejs": "^3.1.7",
     "express": "^4.17.3",
     "multer": "^1.4.4"
   }
