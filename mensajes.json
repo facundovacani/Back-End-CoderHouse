@@ -1,0 +1,52 @@
+{
+  "mensajes": [
+    {
+      "email": "fak@gagaga",
+      "date": "21/3/2022 16:20:59",
+      "mensaje": "Hola genteeee",
+      "id": 1
+    },
+    {
+      "email": "fak@gagaga",
+      "date": "21/3/2022 16:27:41",
+      "mensaje": "Jajajaj",
+      "id": 2
+    },
+    {
+      "email": "chuky@mail",
+      "date": "21/3/2022 16:28:36",
+      "mensaje": "wuapo",
+      "id": 3
+    },
+    {
+      "email": "fak@gagaga",
+      "date": "21/3/2022 16:28:51",
+      "mensaje": "Boleriu",
+      "id": 4
+    },
+    {
+      "email": "facu@mail",
+      "date": "21/3/2022 16:44:38",
+      "mensaje": "Probando\n",
+      "id": 5
+    },
+    {
+      "email": "facu@mail",
+      "date": "21/3/2022 16:44:48",
+      "mensaje": "Cómo están?\n",
+      "id": 6
+    },
+    {
+      "email": "ruso@mail",
+      "date": "21/3/2022 16:55:39",
+      "mensaje": "Que anda la banda",
+      "id": 7
+    },
+    {
+      "email": "fak@bdcom",
+      "date": "21/3/2022 17:2:57",
+      "mensaje": "😊",
+      "id": 8
+    }
+  ]
+}

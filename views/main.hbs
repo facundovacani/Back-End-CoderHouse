@@ -1,29 +1,73 @@
+{{> nav}}
+
+
 <main>
 
-    {{> nav}}
 
-    <h2>Vista de Productos</h2>
+    <section>
 
-    {{#if listaExiste}}
-        <table>
-            <thead>
-                <tr>
-                    <th>Nombre</th>
-                    <th>Precio</th>
-                    <th>Imagen</th>
-                </tr>
-            </thead>
-            <tbody>
-                {{#each productos}}
+        <h2 id="formularioTitle">Ingreso de Productos</h2>
+
+        <form id="formulario">
+            <label for="">Titulo: 
+                <input id="titulo" placeholder="Titulo" type="text" name="title" required/>
+
+            </label>
+            <label for="">Precio: 
+
+                <input id="precio" placeholder="Precio" type="number" name="price" required/>
+            </label>
+            <label for="">Foto: 
+
+                <input id="foto" placeholder="Foto" type="url" name="thumbnail" required/>
+            </label>
+            <input id="enviar-producto" type="submit" value="Guardar Producto" />
+            <span></span>
+        </form>
+        <h2 id="productosTitle">Vista de Productos</h2>
+
+        {{#if listaExiste}}
+            <table id="productos">
+                <thead>
                     <tr>
-                        <td>{{this.title}}</td>
-                        <td>USD {{this.price}}</td>
-                        <td><img src="{{this.thumbnail}}" alt="{{this.title}}"> </td>              
+                        <th>Nombre</th>
+                        <th>Precio</th>
+                        <th>Imagen</th>
                     </tr>
-                {{/each}}
-            </tbody>        
-        </table>
-    {{else}}
-        <h3>No hay productos</h3>
-    {{/if}}
+                </thead>
+                <tbody id="cuerpo">
+                    
+                    {{!-- {{#each productos}}
+                        <tr>
+                            <td>{{this.title}}</td>
+                            <td>USD {{this.price}}</td>
+                            <td><img src="{{this.thumbnail}}" alt="{{this.title}}"> </td>              
+                        </tr>
+                    {{/each}} --}}
+                </tbody>        
+            </table>
+        {{else}}
+            <h3>No hay productos</h3>
+        {{/if}}
+        
+
+    </section>
+
+    <aside>
+        <article>
+            <h2 id="mensajes-chat">Centro de Mensajes</h2>
+            <label>Email:
+                <input type="email" name="email" placeholder="ejemplo@gmail.com" id="email">
+            </label>
+            <section id="chat"></section>
+            <form id="chatForm">
+                <label >Mensaje:
+                    <textarea name="mensaje" placeholder="Escriba su mensaje..." id="mensaje" required></textarea>
+                </label>
+                <input type="submit" value="Enviar">
+            </form>
+
+        </article>
+    </aside>
 </main>
+

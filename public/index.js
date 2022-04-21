@@ -1,10 +1,29 @@
-const $submit = document.querySelector('input[type="submit"]');
-console.log($submit)
-const $title = document.querySelector('input[type="text"]');
-const $price = document.querySelector('input[type="number"]');
-const $thumbnail =  document.querySelector('input[type="url"]');
+const $submit = document.getElementById('enviar-producto');
+
+const $title = document.getElementById('titulo');
+
+const $price = document.getElementById('precio');
+
+const $thumbnail =  document.getElementById('foto');
+
 const $form = document.forms["formulario"];
+
 const $span = document.querySelector("span");
+
+const $navMenu = document.querySelector('nav');
+
+const $tabla = document.getElementById("cuerpo");
+
+const socket = io.connect();
+
+const $chatForm = document.forms["chatForm"];
+
+const $email = document.getElementById("email");
+
+const $mensaje = document.getElementById("mensaje");
+
+const $chat = document.getElementById("chat");
+
 $form.addEventListener("submit", (e)=>{
     e.preventDefault();
     if(($title.value === null || $title.value === undefined || $title.value == "")){
@@ -16,6 +35,88 @@ $form.addEventListener("submit", (e)=>{
         $span.textContent = "Por favor, rellena todos los campos";
 
     }else{
-        $form.submit();
+        const producto = {
+            title: $title.value,
+            price: $price.value,
+            thumbnail: $thumbnail.value
+        }
+        socket.emit("producto-nuevo", producto);
+        $span.textContent = `Producto ${producto.title} agregado con exito`;
+        $title.value ="";
+        $price.value ="";
+        $thumbnail.value ="";
+
     }      
+})
+
+$chatForm.addEventListener("submit", (e)=>{
+    e.preventDefault();
+    if(($email.value === null || $email.value === undefined || $email.value == "" )){
+        $email.title = "Es obligatorio poner el email";
+        $email.focus();
+    }else if(($mensaje.value === null || $mensaje.value === undefined || $mensaje.value == "")){
+        $mensaje.focus();
+        $mensaje.title = "Es obligatorio poner el mensaje";
+    }else{
+        let fecha = new Date();
+        let dia = fecha.getDate();
+        let mes = fecha.getMonth();
+        let year = fecha.getFullYear();
+        let hora = fecha.getHours();
+        let minutos = fecha.getMinutes();
+        let segundos = fecha.getSeconds();
+        let diaCompleto = `${dia}/${mes}/${year} ${hora}:${minutos}:${segundos}`;
+        const mensaje = {
+            email: $email.value,
+            date: diaCompleto,
+            mensaje: $mensaje.value
+        };
+
+        socket.emit("mensaje-nuevo", mensaje);
+        $mensaje.value ="";
+    }
+})
+
+function renderTabla(data){
+    const html = data.map((item)=>{
+        return(
+            `<tr>
+                <td>${item.title}</td>
+                <td>USD ${item.price}</td>
+                <td><img src="${item.thumbnail}" alt="${item.title}"> </td>  
+            </tr>`
+        )
+    }).join(" ");
+    $tabla.innerHTML = html;
+}
+function renderChat(data){
+    const htmlChat = data.map((mnsj)=>{
+        return(
+            `<div>
+                <p>
+                    <span>${mnsj.email}</span>
+                    [<span>${mnsj.date}</span>] : 
+                    <span>${mnsj.mensaje}</span>
+                </p>
+            </div>`
+        )
+    }).join(" ");
+    $chat.innerHTML = htmlChat;
+}
+socket.on("productos", data=>{
+    renderTabla(data);
+})
+socket.on("mensajes", data=>{
+    renderChat(data);
+})
+
+
+
+window.addEventListener( "scroll" , () => {
+    if(window.window.scrollY > 50){
+        $navMenu.classList.add("down");
+
+    } else if (window.window.scrollY <=50){
+        $navMenu.classList.remove("down");
+    };
 })

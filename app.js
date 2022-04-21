@@ -1,7 +1,14 @@
 const express = require("express");
 let Contenedor = require("./contenedor");
+let Chat = require("./chat")
 const {Router} = express;
+const {Server: HttpServer } = require("http");
+const {Server: IOServer } = require("socket.io");
+
+
 const app = express();
+const httpServer = new HttpServer(app);
+const io = new IOServer(httpServer);
 const PORT = 8080;
 const router = Router();
 const handlebars = require("express-handlebars");
@@ -11,10 +18,10 @@ const handlebars = require("express-handlebars");
 app.use(express.json());
 app.use(express.urlencoded({extended:true}));
 app.use("/api", router);
-app.use(express.static("public"));
+app.use("/static", express.static(__dirname + "/public"));
 
 const archivo = new Contenedor("./productos.json");
-
+const mensajes = new Chat("./mensajes.json");
 app.engine(
     "hbs",
     handlebars.engine({
@@ -30,7 +37,7 @@ app.set("views", "./views");
 
 
 
-router.get("/productos", async(req, res)=>{
+router.get("/", async(req, res)=>{
     let lista = await archivo.getAll();
     let existe;
     if(lista.length > 0){
@@ -39,25 +46,24 @@ router.get("/productos", async(req, res)=>{
         existe = false
     }
     res.render("main", {
-        productos: await archivo.getAll(),
+        productos: lista,
         listaExiste: existe 
     })
 })
 
+// router.post("/", async(req,res)=>{
+//     let producto = {
+//         title: req.body.title,
+//         price: req.body.price,
+//         thumbnail: req.body.thumbnail
+//     }
+//     archivo.save(producto);
+//     res.render("main", {
+//         productos: await archivo.getAll(),
+//         listaExiste: true 
+//     });
 
-router.get("/", async(req, res)=>{
-    res.render("formProduct")
-})
-router.post("/productos", async(req,res)=>{
-    let producto = {
-        title: req.body.title,
-        price: req.body.price,
-        thumbnail: req.body.thumbnail
-    }
-    archivo.save(producto);
-    res.render("formProduct");
-
-})
+// })
 
 
 // router.get("/productos/:id", async(req,res) =>{
@@ -68,11 +74,25 @@ router.post("/productos", async(req,res)=>{
 
 
 
-const server = app.listen(PORT, ()=>{
-    console.log(`Escuchando servidor desde el puerto ${server.address().port}`);
+httpServer.listen(PORT, ()=>{
+    console.log("Server ON in http://localhost:"+httpServer.address().port)
 })
 
-server.on("error", error => console.log(`Error: ${error}`))
+io.on("connection", async (socket)=>{
+    console.log("Cliente conectado");
+    socket.emit("productos", await archivo.getAll());
+    socket.emit("mensajes", await mensajes.getAll());
+
+    socket.on("producto-nuevo", async data =>{
+        archivo.save(data);
+        io.sockets.emit("productos", await archivo.getAll());
+    })
+
+    socket.on("mensaje-nuevo", async data =>{
+        mensajes.save(data);
+        io.sockets.emit("mensajes", await mensajes.getAll());
+    })
+})
 
 // app.get("/productos", async (req,res)=>{
 
