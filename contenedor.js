@@ -1,114 +1,86 @@
-const fs = require("fs");
+// const fs = require("fs");
 
 class Contenedor{
-    constructor(archivo){
-        this._archivo = archivo;
-        if(fs.existsSync(archivo)){
-            console.log("Archivo existente")
-        }else{
-            fs.writeFileSync(archivo , '{"productos":[]}');
-        }
+    constructor(tabla, knex){
+        this.tabla = tabla;  
+        this.knex = knex;     
+        this.createTable();
     }
 
-    save(objeto){
-        try{            
-            let data = fs.readFileSync(this._archivo, "utf-8");
-            let array = JSON.parse(data).productos;
-            let id;
-            if(array.length === 0){
-                id = 1;
-            }else{
-                id = array[array.length-1].id + 1;
-            }
-            let nuevoObjeto = {
-                ...objeto,
-                id : id
-            };
-            array.push(nuevoObjeto);
-            fs.writeFileSync(this._archivo , JSON.stringify({productos: array}, null, 2));
-            return nuevoObjeto.id;
-        }catch(err){
-            console.warn(err);
-        }
-    }
-    async putById(id,price){
-        try{
-            let data = await fs.promises.readFile(this._archivo, "utf-8");
-            let array = JSON.parse(data).productos;
-            let bool = array.some(i => i.id == id);
-            if(bool){
-                let index = array.findIndex(i => i.id == id);
-                array[index].price = price;
-                await fs.promises.writeFile(this._archivo , JSON.stringify({productos: array}));  
-                return {result: `Se cambio el precio al item ${array[index].title} con el id ${array[index].id} a ${price}`};
-            }else{
-                return { error : 'producto no encontrado' }
-            }
-        }catch(err){
-            console.warn(err)
-
-        }
-    }
-    async getById(id){
-        try{
-            let data = await fs.promises.readFile(this._archivo, "utf-8");
-            let array = JSON.parse(data).productos;
-            let bool = array.some(i => i.id == id);
-            if(bool){
-                let item = array.find(i => i.id == id);
-                return item;
-            }else{
-                return { error : 'producto no encontrado' }
-            }
-        }catch(err){
-            console.warn(err)
-
-        }
+    async createTable(){
         
-        
-    }
-
-    async getAll(){
         try{
-            let data = await fs.promises.readFile(this._archivo, "utf-8");
-            let array = JSON.parse(data).productos;
-            return array;
+            await this.knex.schema.hasTable(this.tabla).then(exist =>{
+                if(!exist){
+                    return this.knex.schema.createTable(this.tabla, table=>{
+                        table.increments("id").primary().notNullable();
+                        table.string("title").notNullable();
+                        table.integer("price").notNullable();
+                        table.string("thumbnail").notNullable();
+                    });
+                }
+            });
+                
         }catch(err){
-            console.warn(err)
+            console.log(err.message, err.stack);
         }
     }
 
-    async deleteById(id){
-        try{
-            let data = await fs.promises.readFile(this._archivo, "utf-8");
-            let array = JSON.parse(data).productos;
-            let existe = array.some((e) => e.id == id )
-            if(existe){
-                let item = array.findIndex(i => i.id == id);
-                console.log(`Se eliminó el producto ${array[item].title} con id ${array[item].id}`)
-                array.splice(item, 1);
-                await fs.promises.writeFile(this._archivo , JSON.stringify({productos: array}));  
-                return ({result:"Producto Eliminado"});             
-            }else{
-                return({ error : 'producto no encontrado' })
-            }
-
-        }
-        catch(err){
-            console.warn(err)
-        }
-       
+    async addProducts(producto){
+        await this.knex(this.tabla).insert({
+            title: producto.title,
+            price: producto.price,
+            thumbnail: producto.thumbnail
+        }).then(result => {
+            console.log(result);
+        }).catch(err=>{
+            console.log(err);
+        })
     }
 
-    deleteAll(){
-        let data = fs.readFileSync(this._archivo, "utf-8");
-        let array = JSON.parse(data).productos;
-        array.splice(0, array.length)
-        try{            
-            fs.writeFileSync(this._archivo , JSON.stringify({productos: array}));
-        }catch(err){
-            console.warn(err);
-        } 
+    async dropProducts(id){
+        await this.knex(this.tabla).where({id:id}).del().then((result) => {
+            console.log(result);
+        }).catch(err => {
+            console.log(err);
+        });
+    }
+
+    async dropAll(){
+        await this.knex(this.tabla).del().then((result)=>console.log(result))
+        .catch(err => {
+            console.log(err)
+        });
+    }
+
+    async getProducts(){
+        let data = await this.knex(this.tabla).select("title","price","thumbnail", "id")
+        .then((result) => {
+            let res = JSON.parse(JSON.stringify(result));
+            return res;
+        }).catch(err => console.log(err));        
+        return data
+    }
+
+    async getProduct(id){
+        let data = await this.knex(this.tabla).where({id:id}).select("title","price","thumbnail").then(result => {
+            let res = JSON.parse(JSON.stringify(result));
+            return res;
+        })
+        .catch(err => console.log(err));
+        return data;
+    }
+
+    async updateProduct(id,producto){
+        await this.knex(this.tabla).where({id:id}).update({
+            title: producto.title,
+            price: producto.price,
+            thumbnail: producto.thumbnail
+        }).then((result) => {
+            console.log(result);
+        }).catch(err => {
+            console.log(err);
+        })
     }
 }
 

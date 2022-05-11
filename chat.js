@@ -1,14 +1,60 @@
-const fs = require("fs");
 
 class Chat{
-    constructor(archivo){
-        this._archivo = archivo;
-        if(fs.existsSync(archivo)){
-            console.log("Archivo existente")
-        }else{
-            fs.writeFileSync(archivo , '{"mensajes":[]}');
+    constructor(tabla,knex){
+        this.tabla = tabla;   
+        this.knex = knex;
+        this.createTable();
+    }
+    async createTable(){
+        
+        try{
+
+            await this.knex.schema.hasTable(this.tabla).then(exist =>{
+                if(!exist){
+                    return this.knex.schema.createTable(this.tabla, table=>{
+                        table.increments("id").primary().notNullable();
+                        table.string("email").notNullable();
+                        table.string("mensaje").notNullable();
+                        table.string("date").notNullable();
+                    });
+                }
+            });
+        
+                
+        }catch(err){
+            console.log(err.message, err.stack);
         }
     }
+
+    
+    async save(mensajes){
+        await this.knex(this.tabla).insert({
+            email: mensajes.email,
+            date: mensajes.date,
+            mensaje: mensajes.mensaje
+        }).then(result => {
+            console.log(result);
+        }).catch(err=>{
+            console.log(err);
+        })
+    }
+
+
+    async getAll(){
+        let data = await this.knex(this.tabla).select("email","mensaje","date")
+        .then((result) => {
+            let res = JSON.parse(JSON.stringify(result));
+            return res;
+        }).catch(err => console.log(err));        
+        return data;
+    }
+}
+
+module.exports = Chat;
+
+
+/* 
+
 
     save(objeto){
         try{            
@@ -93,6 +139,4 @@ class Chat{
             console.warn(err);
         } 
     }
-}
-
-module.exports = Chat;
+*/

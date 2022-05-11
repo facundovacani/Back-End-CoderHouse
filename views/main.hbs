@@ -26,29 +26,27 @@
         </form>
         <h2 id="productosTitle">Vista de Productos</h2>
 
-        {{#if listaExiste}}
-            <table id="productos">
-                <thead>
+        <table id="productos">
+            <thead>
+                <tr>
+                    <th>Nombre</th>
+                    <th>Precio</th>
+                    <th>Imagen</th>
+                    <th>Borrar</th>
+                </tr>
+            </thead>
+            <tbody id="cuerpo">
+                
+                {{!-- {{#each productos}}
                     <tr>
-                        <th>Nombre</th>
-                        <th>Precio</th>
-                        <th>Imagen</th>
+                        <td>{{this.title}}</td>
+                        <td>USD {{this.price}}</td>
+                        <td><img src="{{this.thumbnail}}" alt="{{this.title}}"> </td>              
                     </tr>
-                </thead>
-                <tbody id="cuerpo">
-                    
-                    {{!-- {{#each productos}}
-                        <tr>
-                            <td>{{this.title}}</td>
-                            <td>USD {{this.price}}</td>
-                            <td><img src="{{this.thumbnail}}" alt="{{this.title}}"> </td>              
-                        </tr>
-                    {{/each}} --}}
-                </tbody>        
-            </table>
-        {{else}}
-            <h3>No hay productos</h3>
-        {{/if}}
+                {{/each}} --}}
+            </tbody>        
+        </table>
+
         
 
     </section>

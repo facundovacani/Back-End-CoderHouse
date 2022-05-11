@@ -53,6 +53,12 @@
       "price": "30",
       "thumbnail": "https://image.api.playstation.com/vulcan/img/cfn/11307RW7B5mvRMeOG-1pM9RnGdpRQVQ2iXinFe9755wHVXH0-mRqwizRWZQK8wMHat3XhtITgBGvRuT7JLJkkZenNxUerkoj.png",
       "id": 13
+    },
+    {
+      "title": "Camiseta Uruguay",
+      "price": "110",
+      "thumbnail": "https://http2.mlstatic.com/D_NQ_NP_882207-MLU47746943362_102021-O.jpg",
+      "id": 14
     }
   ]
 }

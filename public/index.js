@@ -24,6 +24,7 @@ const $mensaje = document.getElementById("mensaje");
 
 const $chat = document.getElementById("chat");
 
+
 $form.addEventListener("submit", (e)=>{
     e.preventDefault();
     if(($title.value === null || $title.value === undefined || $title.value == "")){
@@ -77,20 +78,32 @@ $chatForm.addEventListener("submit", (e)=>{
     }
 })
 
-function renderTabla(data){
-    const html = data.map((item)=>{
+
+
+async function renderTabla(data){
+    const html = await data.map((item)=>{
         return(
             `<tr>
                 <td>${item.title}</td>
                 <td>USD ${item.price}</td>
-                <td><img src="${item.thumbnail}" alt="${item.title}"> </td>  
+                <td><img src="${item.thumbnail}" alt="${item.title}"> </td>
+                <td><button id="${item.id}" class="boton-borrar">Borrar</button></td>
             </tr>`
         )
     }).join(" ");
     $tabla.innerHTML = html;
+    const $botonesD = document.querySelectorAll(".boton-borrar");
+    $botonesD.forEach(el => {
+        el.addEventListener("click", (e)=>{
+            console.log(e.target.id)
+            let idB = e.target.id;
+            socket.emit("eliminar-item", idB);
+        })
+    })
 }
-function renderChat(data){
-    const htmlChat = data.map((mnsj)=>{
+
+async function renderChat(data){
+    const htmlChat = await data.map((mnsj)=>{
         return(
             `<div>
                 <p>
