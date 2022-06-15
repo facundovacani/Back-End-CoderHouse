@@ -1,18 +1,20 @@
 const $submit = document.getElementById('enviar-producto');
 
-const $title = document.getElementById('titulo');
+// const $title = document.getElementById('titulo');
 
-const $price = document.getElementById('precio');
+// const $price = document.getElementById('precio');
 
-const $thumbnail =  document.getElementById('foto');
+// const $thumbnail =  document.getElementById('foto');
 
-const $form = document.forms["formulario"];
+// const $form = document.forms["formulario"];
 
-const $span = document.querySelector("span");
+// const $span = document.querySelector("span");
 
 const $navMenu = document.querySelector('nav');
 
 const $tabla = document.getElementById("cuerpo");
+
+const $tablaTitulo = document.getElementById("productosTitle");
 
 const socket = io.connect();
 
@@ -24,30 +26,30 @@ const $mensaje = document.getElementById("mensaje");
 
 const $chat = document.getElementById("chat");
 
-$form.addEventListener("submit", (e)=>{
-    e.preventDefault();
-    if(($title.value === null || $title.value === undefined || $title.value == "")){
-        $span.textContent = "Por favor, rellena todos los campos";
-    }else if(($price.value === null || $price.value === undefined || $price.value == "") ){
-        $span.textContent = "Por favor, rellena todos los campos";
+// $form.addEventListener("submit", (e)=>{
+//     e.preventDefault();
+//     if(($title.value === null || $title.value === undefined || $title.value == "")){
+//         $span.textContent = "Por favor, rellena todos los campos";
+//     }else if(($price.value === null || $price.value === undefined || $price.value == "") ){
+//         $span.textContent = "Por favor, rellena todos los campos";
 
-    }else if( ($thumbnail.value === null || $thumbnail.value === undefined || $thumbnail.value == "")){
-        $span.textContent = "Por favor, rellena todos los campos";
+//     }else if( ($thumbnail.value === null || $thumbnail.value === undefined || $thumbnail.value == "")){
+//         $span.textContent = "Por favor, rellena todos los campos";
 
-    }else{
-        const producto = {
-            title: $title.value,
-            price: $price.value,
-            thumbnail: $thumbnail.value
-        }
-        socket.emit("producto-nuevo", producto);
-        $span.textContent = `Producto ${producto.title} agregado con exito`;
-        $title.value ="";
-        $price.value ="";
-        $thumbnail.value ="";
+//     }else{
+//         const producto = {
+//             title: $title.value,
+//             price: $price.value,
+//             thumbnail: $thumbnail.value
+//         }
+//         socket.emit("producto-nuevo", producto);
+//         $span.textContent = `Producto ${producto.title} agregado con exito`;
+//         $title.value ="";
+//         $price.value ="";
+//         $thumbnail.value ="";
 
-    }      
-})
+//     }      
+// })
 
 $chatForm.addEventListener("submit", (e)=>{
     e.preventDefault();
@@ -67,9 +69,12 @@ $chatForm.addEventListener("submit", (e)=>{
         let segundos = fecha.getSeconds();
         let diaCompleto = `${dia}/${mes}/${year} ${hora}:${minutos}:${segundos}`;
         const mensaje = {
-            email: $email.value,
-            date: diaCompleto,
-            mensaje: $mensaje.value
+            author: {
+                email: $email.value,
+                date: diaCompleto
+            },
+            text: $mensaje.value           
+          
         };
 
         socket.emit("mensaje-nuevo", mensaje);
@@ -78,12 +83,20 @@ $chatForm.addEventListener("submit", (e)=>{
 })
 
 function renderTabla(data){
+    console.log(data)
     const html = data.map((item)=>{
+        // return(
+        //     `<tr>
+        //         <td>${item.title}</td>
+        //         <td>USD ${item.price}</td>
+        //         <td><img src="${item.thumbnail}" alt="${item.title}"> </td>  
+        //     </tr>`
+        // )
         return(
             `<tr>
-                <td>${item.title}</td>
-                <td>USD ${item.price}</td>
-                <td><img src="${item.thumbnail}" alt="${item.title}"> </td>  
+                <td>${item.nombre}</td>
+                <td>USD ${item.precio}</td>
+                <td><img src="${item.foto}" alt="${item.nombre}"> </td>  
             </tr>`
         )
     }).join(" ");
@@ -94,21 +107,27 @@ function renderChat(data){
         return(
             `<div>
                 <p>
-                    <span>${mnsj.email}</span>
-                    [<span>${mnsj.date}</span>] : 
-                    <span>${mnsj.mensaje}</span>
+                    <span>${mnsj.author.email}</span>
+                    [<span>${mnsj.author.date}</span>] : 
+                    <span>${mnsj.text}</span>
                 </p>
             </div>`
         )
     }).join(" ");
     $chat.innerHTML = htmlChat;
 }
-socket.on("productos", data=>{
-    renderTabla(data);
-})
-socket.on("mensajes", data=>{
-    renderChat(data);
-})
+if(window.location.pathname == "/api/productos-test"){
+    socket.on("productos", data=>{
+        renderTabla(data);
+    })
+    $chat.parentElement.parentElement.style.display = "none";
+}else{
+    socket.on("mensajes", data=>{
+        renderChat(data);
+    })
+    $tablaTitulo.parentElement.style.display = "none";
+    
+}
 
 
 
