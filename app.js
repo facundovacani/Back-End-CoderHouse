@@ -1,20 +1,25 @@
 const express = require("express");
-// let Contenedor = require("./contenedor");
-let Chat = require("./chat")
-const {Router} = express;
 const {Server: HttpServer } = require("http");
 const {Server: IOServer } = require("socket.io");
+const handlebars = require("express-handlebars");
+
+
+const router = require("./src/routes/router1");
+const router2 = require("./src/routes/router2");
+let Contenedor = require("./src/models/contenedor");
+let Chat = require("./src/models/chat");
+// const {products} = require("./src/faker");
+
+
+
 const app = express();
 const httpServer = new HttpServer(app);
 const io = new IOServer(httpServer);
 const PORT = 8080;
-const router = Router();
-const router2 = Router();
-const handlebars = require("express-handlebars");
-const faker = require("faker");
-const {commerce, image} = faker;
-const { schema, normalize, denormalize  } = require("normalizr");
-const util = require("util");
+
+
+const archivo = new Contenedor("./db/productos.json");
+const mensajes = new Chat("./db/mensajes.json");
 
 app.use(express.json());
 app.use(express.urlencoded({extended:true}));
@@ -22,8 +27,8 @@ app.use("/api", router);
 app.use("/api/productos-test", router2);
 app.use("/static", express.static(__dirname + "/public"));
 
-// const archivo = new Contenedor("./productos.json");
-const mensajes = new Chat("./mensajes.json");
+
+
 app.engine(
     "hbs",
     handlebars.engine({
@@ -37,77 +42,6 @@ app.engine(
 app.set("view engine", "hbs");
 app.set("views", "./views");
 
-function products(){
-    const lista = [];
-
-    for(let i = 0; i < 5; i++){
-        let obj = {
-            nombre: commerce.product() ,
-            precio: commerce.price(50, 200, 2, "$ "),
-            foto: image.cats()
-        }
-        lista.push(obj);
-    }
-
-    return lista;
-}
-
-
-router2.get("/", async(req, res)=>{
-    // let lista = await archivo.getAll();
-    
-    let existe = true;
-    // if(lista.length > 0){
-    //     existe = true;
-    // }else{
-    //     existe = false
-    // }
-    res.render("main", {
-        // productos: products(),
-        listaExiste: existe 
-    })
-})
-
-router.get("/",async(req,res)=>{
-
-    res.render("main",{
-        listaExiste: false
-    });
-})
-
-
-
-
-
-//-----------------------------------------------------------
-
-async function traerArray(){
-    let array = await mensajes.getAll();
-    return array;
-}
-
-async function leer(){
-    let array = await mensajes.getAll()
-    console.log(JSON.stringify(array).length)
-}
-
-const schemaAuthor = new schema.Entity("author",{},{idAttribute: "email"});
-const schemaChat = new schema.Entity("chat",{
-    author: schemaAuthor
-});
-
-async function chatCompleto(){
-    
-    const arrayMensaje = await traerArray();
-    const normalizrChat = normalize(arrayMensaje, schemaChat);
-    console.log(util.inspect(normalizrChat, true,12,true));
-    return normalizrChat
-}
-
-
-chatCompleto()
-//-----------------------------------------------------------
-
 
 
 
@@ -116,14 +50,14 @@ httpServer.listen(PORT, ()=>{
 })
 io.on("connection", async (socket)=>{
     console.log("Cliente conectado");
-    // socket.emit("productos", await archivo.getAll());
-    socket.emit("productos", products() );
+    socket.emit("productos", await archivo.getAll());
+    // socket.emit("productos", products() );
     socket.emit("mensajes", await mensajes.getAll());
 
-    // socket.on("producto-nuevo", async data =>{
-    //     archivo.save(data);
-    //     io.sockets.emit("productos", await archivo.getAll());
-    // })
+    socket.on("producto-nuevo", async data =>{
+        archivo.save(data);
+        io.sockets.emit("productos", await archivo.getAll());
+    })
 
     socket.on("mensaje-nuevo", async data =>{
         mensajes.save(data);
