@@ -53,6 +53,18 @@
       "price": "30",
       "thumbnail": "https://image.api.playstation.com/vulcan/img/cfn/11307RW7B5mvRMeOG-1pM9RnGdpRQVQ2iXinFe9755wHVXH0-mRqwizRWZQK8wMHat3XhtITgBGvRuT7JLJkkZenNxUerkoj.png",
       "id": 13
+    },
+    {
+      "title": "Hipoclorito",
+      "price": "3",
+      "thumbnail": "https://www.todoaseo.com/wp-content/uploads/2017/01/Hipoclorito-Galon.jpg",
+      "id": 14
+    },
+    {
+      "title": "long",
+      "price": "50",
+      "thumbnail": "https://cdn.skatepro.com/product/440/loaded-tarab-dancer-complete-longboard-nf.jpg",
+      "id": 15
     }
   ]
 }

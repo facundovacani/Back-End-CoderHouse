@@ -1,0 +1,23 @@
+{{>nav}}
+<main>
+
+
+    <h2>Ingresar</h2>
+    <section>
+        <form id="login-usuario">
+            <label for="">Usuario: 
+                <input id="username" placeholder="Usuario" type="text" name="username" required/>
+
+            </label>
+            <label for="">Contraseña: 
+                <input id="password" placeholder="Contraseña" type="password" name="password" required/>
+            </label>
+            <input id="entrar" type="submit" value="Entrar" />
+            <span id="por-error"></span>
+            <p>Si no estás registrado, registrate aquí</p>
+            <button><a href="/api/sign-in">Registrarse</a></button>
+        </form>
+
+    </section>
+</main>
+
