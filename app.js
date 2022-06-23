@@ -33,6 +33,9 @@ const mensajes = new Chat("./db/mensajes.json");
 app.use(session({
     store: MongoStore.create({mongoUrl: "mongodb://localhost/sesiones"}),
     secret: "pag",
+    cookie:{
+        expires:600000
+    },
     resave: false,
     saveUninitialized: false
 }))
@@ -67,7 +70,8 @@ function checkAdmin(req,res,next){
 router.get("/",checkAdmin,async(req,res)=>{
 
     res.render("main",{
-        listaExiste: false
+        listaExiste: false,
+        username: req.session.user
     });
 })
 
@@ -77,12 +81,14 @@ router.get("/productos",checkAdmin, async(req,res)=>{
     if(req.session?.admin){
         res.render("main",{
             listaExiste: existe,
-            admin: true
+            admin: true,
+            username: req.session.user
         });
     }else{
         res.render("main",{
             listaExiste: existe,
-            admin: false
+            admin: false,
+            username: req.session.user
         });
     }
 })
@@ -115,6 +121,7 @@ router.post("/login", async (req,res)=>{
 })
 
 router.get("/logout", async (req,res)=>{
+    let username = req.session.user;
     req.session.destroy(error =>{
         if(error){
             res.json({
@@ -124,18 +131,31 @@ router.get("/logout", async (req,res)=>{
         }
     })
 
-    res.render("login",{
-        noLogged:true
-    })
+    return res.render("logout",{noLogged:true, username: username});
+
 })
 router.get("/sign-in", async(req,res)=>{
     res.render("sign-in",{
         noLogged:true
     })
 })
-// router.post("/sign-in", async (req,res)=>{
-
-// })
+router.post("/sign-in", async (req,res)=>{
+    const {username, password} = req.body;
+    let usuario = await mongoUser.verificarUsuario(username);
+    if(usuario){
+        res.json({
+            result: "usuario ya existente"
+        })
+    }else{
+        let crearUser = await mongoUser.crearUsuario(username,password)
+        req.session.user = username;
+        req.session.admin = false;
+        req.session.logged = true;       
+        res.json({
+            result: "Correcto"
+        })
+    }
+})
 httpServer.listen(PORT, ()=>{
     console.log("Server ON in http://localhost:"+httpServer.address().port)
 })

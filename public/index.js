@@ -173,10 +173,36 @@ window.addEventListener("DOMContentLoaded", (e)=>{
                 })
             }else{
                 $porError.textContent = "Por favor, ingrese los datos correctamente";
+                
             }
         })
 
 
+    }else if(window.location.pathname == "/api/sign-in"){
+        $formRegisterUser.addEventListener("submit", (e)=>{
+            e.preventDefault();
+            if(verificarUser($nombreUser, $password)){
+                fetch("http://localhost:8080/api/sign-in",{
+                    method: "POST",
+                    mode: "cors",
+                    headers:{
+                        "Content-Type": "application/json"
+                    },
+                    body: JSON.stringify({
+                        username: $nombreUser.value,
+                        password: $password.value
+                    })
+                }).then(data => data.json()).then(data=>{
+                    if(data.result == "Correcto"){
+                        console.log(data);
+                        window.location.href = "http://localhost:8080/api/"
+                    }else{
+                        console.log($porError)
+                        $porError.textContent = data.result;
+                    }
+                })
+            }
+        })
     }
 
 })

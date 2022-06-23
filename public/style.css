@@ -88,6 +88,12 @@ main > section{
     -ms-border-radius: 5px;
     -o-border-radius: 5px;
 }
+.bienvenido{
+    display: flex;
+    width: 80%;
+    margin: 5px auto;
+    justify-content: space-around;
+}
 h2{
     text-align: center;
     font-size: 38px;
