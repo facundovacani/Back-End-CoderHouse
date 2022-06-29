@@ -21,7 +21,7 @@ const PORT = 8080;
 const MONGO_URL = "mongodb://localhost/sesiones";
 const mongoUser = new MongoUser();
 
-
+//mongod -dbpath "rutaDBMongo"  ... Recordar para abrir la base de datos
 mongoose.connect(MONGO_URL,{
     useNewUrlParser:true,
     useUnifiedTopology:true
