@@ -92,20 +92,22 @@ async function leer(){
 }
 
 const schemaAuthor = new schema.Entity("author",{},{idAttribute: "email"});
+const schemaMensaje = new schema.Entity("mensaje", {
+    author:schemaAuthor
+}, {idAttribute: "id"});
+
 const schemaChat = new schema.Entity("chat",{
-    author: schemaAuthor
-});
+    mensajes: [schemaMensaje]
+},{idAttribute: "id"});
 
 async function chatCompleto(){
-    
-    const arrayMensaje = await traerArray();
-    const normalizrChat = normalize(arrayMensaje, schemaChat);
+    const mensajes = await traerArray();
+    const normalizrChat = normalize( {id:"chat",mensajes}, schemaChat);
     console.log(util.inspect(normalizrChat, true,12,true));
     return normalizrChat
 }
 
 
-chatCompleto()
 //-----------------------------------------------------------
 
 
@@ -118,7 +120,7 @@ io.on("connection", async (socket)=>{
     console.log("Cliente conectado");
     // socket.emit("productos", await archivo.getAll());
     socket.emit("productos", products() );
-    socket.emit("mensajes", await mensajes.getAll());
+    socket.emit("mensajes", await chatCompleto());
 
     // socket.on("producto-nuevo", async data =>{
     //     archivo.save(data);
@@ -127,7 +129,7 @@ io.on("connection", async (socket)=>{
 
     socket.on("mensaje-nuevo", async data =>{
         mensajes.save(data);
-        io.sockets.emit("mensajes", await mensajes.getAll());
+        io.sockets.emit("mensajes", await chatCompleto());
     })
 })
 

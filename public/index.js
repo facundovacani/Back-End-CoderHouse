@@ -1,3 +1,4 @@
+
 const $submit = document.getElementById('enviar-producto');
 
 // const $title = document.getElementById('titulo');
@@ -82,6 +83,18 @@ $chatForm.addEventListener("submit", (e)=>{
     }
 })
 
+
+//desnormalizando
+const schemaAuthor = new normalizr.schema.Entity("author",{},{idAttribute: "email"});
+const schemaMensaje = new normalizr.schema.Entity("mensaje", {
+    author:schemaAuthor
+}, {idAttribute: "id"});
+
+const schemaChat = new normalizr.schema.Entity("chat",{
+    mensajes: [schemaMensaje]
+},{idAttribute: "id"});
+
+
 function renderTabla(data){
     console.log(data)
     const html = data.map((item)=>{
@@ -103,7 +116,7 @@ function renderTabla(data){
     $tabla.innerHTML = html;
 }
 function renderChat(data){
-    const htmlChat = data.map((mnsj)=>{
+    const htmlChat = data.mensajes.map((mnsj)=>{
         return(
             `<div>
                 <p>
@@ -123,7 +136,21 @@ if(window.location.pathname == "/api/productos-test"){
     $chat.parentElement.parentElement.style.display = "none";
 }else{
     socket.on("mensajes", data=>{
-        renderChat(data);
+        let mensajesPeso = JSON.stringify(data).length;
+        let mensajes = normalizr.denormalize(data.result, schemaChat, data.entities);
+        console.log(mensajesPeso)
+        let mensajesDPeso = JSON.stringify(mensajes).length;
+        console.log(mensajesDPeso)
+        let porcentaje = parseInt((mensajesDPeso*100)/mensajesPeso);
+        let h3 = document.createElement("h3");
+        h3.textContent = porcentaje;
+        let progress = document.createElement("progress");
+        progress.setAttribute("value", porcentaje);
+        progress.setAttribute("max", 100);
+        let article = $chat.parentElement;
+        article.insertBefore(h3, $chat);
+        article.insertBefore(progress, $chat);
+        renderChat(mensajes);
     })
     $tablaTitulo.parentElement.style.display = "none";
     

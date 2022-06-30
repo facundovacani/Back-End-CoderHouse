@@ -54,7 +54,7 @@ class Chat{
     async getAll(){
         try{
             let data = await fs.promises.readFile(this._archivo, "utf-8");
-            let array = JSON.parse(data).mensajes;
+            let array = JSON.parse(data);
             return array;
         }catch(err){
             console.warn(err)
