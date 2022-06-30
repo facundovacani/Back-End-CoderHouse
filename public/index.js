@@ -162,14 +162,16 @@ window.addEventListener("DOMContentLoaded", (e)=>{
                         username: $nombreUser.value,
                         password: $password.value
                     })
-                }).then(data=> data.json()).then((data)=> {
-                    if(data.result == "Correcto"){
-                        console.log(data);
-                        window.location.href = "http://localhost:8080/api/"
+                }).then((data)=> {
+                    console.log(data);
+                    if(data.status < 300 && data.status >= 200)
+                    {
+                        window.location.href = "http://localhost:8080/api/profile";
                     }else{
-                        console.log($porError)
-                        $porError.textContent = data.result;
+                        $porError.textContent = "Credenciales incorrectas ";
                     }
+                    
+                    
                 })
             }else{
                 $porError.textContent = "Por favor, ingrese los datos correctamente";
@@ -192,14 +194,14 @@ window.addEventListener("DOMContentLoaded", (e)=>{
                         username: $nombreUser.value,
                         password: $password.value
                     })
-                }).then(data => data.json()).then(data=>{
-                    if(data.result == "Correcto"){
-                        console.log(data);
-                        window.location.href = "http://localhost:8080/api/"
+                }).then((data)=>{
+                    if(data.status < 300 && data.status >= 200)
+                    {
+                        window.location.href = "http://localhost:8080/api/profile";
                     }else{
-                        console.log($porError)
-                        $porError.textContent = data.result;
+                        $porError.textContent = "Usuario ya existente";
                     }
+                    
                 })
             }
         })

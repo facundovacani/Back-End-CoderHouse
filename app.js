@@ -5,11 +5,15 @@ const handlebars = require("express-handlebars");
 const session = require("express-session");
 const MongoStore = require("connect-mongo");
 const mongoose = require('mongoose');
+const passport = require("passport");
+const LocalStrategy = require("passport-local").Strategy;
 
 let {MongoUser} = require("./src/contenedores/mongoUser");
 let Contenedor = require("./src/contenedores/contenedor");
 let Chat = require("./src/contenedores/chat");
 // const {products} = require("./src/faker");
+let metodos = require("./src/routes/routes");
+let bcrypts = require("./src/utils/bcrypts");
 
 const {Router} = express;
 const router = Router();
@@ -18,8 +22,14 @@ const app = express();
 const httpServer = new HttpServer(app);
 const io = new IOServer(httpServer);
 const PORT = 8080;
-const MONGO_URL = "mongodb://localhost/sesiones";
 const mongoUser = new MongoUser();
+const userModelo = require("./src/models/schemaUsers");
+
+
+const archivo = new Contenedor("./db/productos.json");
+const mensajes = new Chat("./db/mensajes.json");
+
+const MONGO_URL = "mongodb://localhost/sesiones";
 
 //mongod -dbpath "rutaDBMongo"  ... Recordar para abrir la base de datos
 mongoose.connect(MONGO_URL,{
@@ -27,8 +37,6 @@ mongoose.connect(MONGO_URL,{
     useUnifiedTopology:true
 }, ()=>console.log("MongoDB conectado"));
 
-const archivo = new Contenedor("./db/productos.json");
-const mensajes = new Chat("./db/mensajes.json");
 
 app.use(session({
     store: MongoStore.create({mongoUrl: "mongodb://localhost/sesiones"}),
@@ -45,19 +53,91 @@ app.use("/api", router);
 app.use("/static", express.static(__dirname + "/public"));
 
 
-
 app.engine(
     "hbs",
     handlebars.engine({
         extname: ".hbs",
         defaultLayout: "index.hbs",
         layoutsDir:__dirname + "/views/layouts",
-        partialsDir:__dirname + "/views/partials/"
+        partialsDir:__dirname + "/views/partials/",
+        runtimeOptions: {
+            allowProtoPropertiesByDefault: true,
+            allowProtoMethodsByDefault: true,
+        }
     })
 );
 
 app.set("view engine", "hbs");
 app.set("views", "./views");
+
+passport.use("login", new LocalStrategy(
+    (username,password, callback)=>{
+        userModelo.findOne({username}, (err,user)=>{
+            if(err){
+                return callback(err);
+            }
+            if(!user){
+                console.log("User not found with username " + username);
+                return callback(null,false);
+            }
+            if(!bcrypts.isValidPassword(user,password)){
+                console.log("Invalid Password");
+                return callback(null, false);
+            }
+
+            return callback(null,user);
+        });
+    }
+))
+
+
+
+passport.use("signup", new LocalStrategy(
+    {passReqToCallback:true}, (req,username,password,done)=>{
+        userModelo.findOne({"username":username}, function(err,user){
+            if(err){
+                console.log("Error in SignUp: "+ err);
+                return done(err);
+            }
+            if(user){
+                console.log("User already exists");
+                return done(null,false);
+            }
+
+            console.log(req.body);
+
+            const newUser = {
+                username: username,
+                password: bcrypts.createHash(password),
+                admin: false             
+            }
+            
+            console.log(newUser);
+
+            userModelo.create(newUser, (err, userWithId)=>{
+                if(err){
+                    console.log("Error in Saving user: "+ err);
+                    return done(err);
+                }
+                console.log(userWithId);
+                console.log("User Registration succesful");
+                return done(null, userWithId);
+            });
+        });
+    }
+))
+
+passport.serializeUser((user,done)=>{
+    done(null,user._id);
+});
+
+passport.deserializeUser((id,done)=>{
+    userModelo.findById(id,done);
+})
+
+
+
+
 
 function checkAdmin(req,res,next){
     if(req.session?.logged){
@@ -76,49 +156,15 @@ router.get("/",checkAdmin,async(req,res)=>{
 })
 
 
-router.get("/productos",checkAdmin, async(req,res)=>{
-    let existe = true;
-    if(req.session?.admin){
-        res.render("main",{
-            listaExiste: existe,
-            admin: true,
-            username: req.session.user
-        });
-    }else{
-        res.render("main",{
-            listaExiste: existe,
-            admin: false,
-            username: req.session.user
-        });
-    }
-})
+router.get("/productos",checkAdmin, metodos.getProducts)
 
-router.get("/login", async ( req , res)=>{
-    res.render("login",{
-        noLogged:true
-    })
-})
-router.post("/login", async (req,res)=>{
-    const {username, password} = req.body;
-    let usuario = await mongoUser.verificarUsuario(username);
-    if(usuario !== false){   
-        if(password == usuario.password){
-            req.session.user = usuario.username;
-            req.session.admin = usuario.admin;
-            req.session.logged = true;            
-            res.json({
-                result: "Correcto",
-                usuario
-            });
-        }else{
-            res.json({result:"Contraseña incorrecta"})
-        }
-    }else{
-        res.json({
-            result: "Usuario incorrecto"
-        });
-    }
-})
+router.get("/login", metodos.getLogin)
+router.post("/login", passport.authenticate('login'), metodos.postLogin);
+
+router.get("/profile", metodos.getProfile);
+
+router.get("/error-login", metodos.getProfile);
+
 
 router.get("/logout", async (req,res)=>{
     let username = req.session.user;
@@ -139,23 +185,7 @@ router.get("/sign-in", async(req,res)=>{
         noLogged:true
     })
 })
-router.post("/sign-in", async (req,res)=>{
-    const {username, password} = req.body;
-    let usuario = await mongoUser.verificarUsuario(username);
-    if(usuario){
-        res.json({
-            result: "usuario ya existente"
-        })
-    }else{
-        let crearUser = await mongoUser.crearUsuario(username,password)
-        req.session.user = username;
-        req.session.admin = false;
-        req.session.logged = true;       
-        res.json({
-            result: "Correcto"
-        })
-    }
-})
+router.post("/sign-in", passport.authenticate('signup'), metodos.postSignup)
 httpServer.listen(PORT, ()=>{
     console.log("Server ON in http://localhost:"+httpServer.address().port)
 })
