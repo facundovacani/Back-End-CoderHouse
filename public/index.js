@@ -141,9 +141,9 @@ if(window.location.pathname == "/api/productos-test"){
         console.log(mensajesPeso)
         let mensajesDPeso = JSON.stringify(mensajes).length;
         console.log(mensajesDPeso)
-        let porcentaje = parseInt((mensajesDPeso*100)/mensajesPeso);
+        let porcentaje = parseInt((mensajesPeso*100)/mensajesDPeso);
         let h3 = document.createElement("h3");
-        h3.textContent = porcentaje;
+        h3.textContent = porcentaje + " %";
         let progress = document.createElement("progress");
         progress.setAttribute("value", porcentaje);
         progress.setAttribute("max", 100);
