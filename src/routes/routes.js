@@ -1,17 +1,9 @@
 
-function getRoot(req, res) {
-    res.render('main')
-}
 
 function getLogin(req, res) {
     res.render("login",{
         noLogged:true
     })
-}
-
-
-function getSignup(req, res) {
-    res.render('signup');
 }
 
 function postLogin (req, res) {
@@ -54,12 +46,12 @@ function getProfile (req, res) {
 
 function getFaillogin (req, res) {
     console.log('error en login');
-    res.render('login-error', {});
+    res.render('error-login', {});
 }
 
 function getFailsignup (req, res) {
     console.log('error en signup');
-    res.render('signup-error', {});
+    res.render('error-signin', {});
 }
 
 function getLogout (req, res) {
@@ -93,13 +85,12 @@ function getProducts(req,res){
 }
 
 module.exports = {
-    getRoot,
+    
     getLogin,
     postLogin,
     getFaillogin,
     getLogout,
     failRoute,
-    getSignup,
     postSignup,
     getFailsignup,
     getProfile,

@@ -164,11 +164,13 @@ window.addEventListener("DOMContentLoaded", (e)=>{
                     })
                 }).then((data)=> {
                     console.log(data);
+                    debugger;
                     if(data.status < 300 && data.status >= 200)
                     {
                         window.location.href = "http://localhost:8080/api/profile";
                     }else{
                         $porError.textContent = "Credenciales incorrectas ";
+                        window.location.href = "http://localhost:8080/api/error-login";
                     }
                     
                     
@@ -200,6 +202,7 @@ window.addEventListener("DOMContentLoaded", (e)=>{
                         window.location.href = "http://localhost:8080/api/profile";
                     }else{
                         $porError.textContent = "Usuario ya existente";
+                        window.location.href = "http://localhost:8080/api/error-signin";
                     }
                     
                 })
