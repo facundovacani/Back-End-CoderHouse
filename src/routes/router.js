@@ -1,6 +1,7 @@
 const express = require("express");
 const {Router} = express;
 let metodos = require("./routes");
+const { fork } = require("child_process");
 
 const router = Router();
 
@@ -83,7 +84,7 @@ passport.deserializeUser((id,done)=>{
 
 
 
-function checkAdmin(req,res,next){
+function checkLogged(req,res,next){
     if(req.session?.logged){
         return next();
     }
@@ -92,7 +93,7 @@ function checkAdmin(req,res,next){
 
 
 
-router.get("/",checkAdmin,async(req,res)=>{
+router.get("/",checkLogged,async(req,res)=>{
 
     res.render("main",{
         listaExiste: false,
@@ -101,7 +102,7 @@ router.get("/",checkAdmin,async(req,res)=>{
 })
 
 
-router.get("/productos",checkAdmin, metodos.getProducts)
+router.get("/productos",checkLogged, metodos.getProducts)
 
 router.get("/login", metodos.getLogin)
 router.post("/login", passport.authenticate('login', {failureRedirect : "/error-login"}), metodos.postLogin);
@@ -124,17 +125,36 @@ router.get("/logout", async (req,res)=>{
 
     return res.render("logout",{noLogged:true, username: username});
 
-})
+});
 router.get("/sign-in", async(req,res)=>{
     res.render("sign-in",{
         noLogged:true
     })
-})
+});
 router.post("/sign-in", passport.authenticate('signup',{failureRedirect : "/error-signin"}), metodos.postSignup)
 router.get("/error-signin", async(req,res)=>{
     res.render("error-signin",{
         noLogged:true
     })
-})
+});
+
+
+router.get("/randoms",  (req,res)=>{
+    let {
+        cant  = 100000000
+    } = req.query;
+    
+    let cantidad = Number(cant);
+    if(Number.isNaN(cantidad)){
+        cantidad = 100000000
+    }
+    const computo = fork("./src/routes/computo.js");
+    computo.send(cantidad)
+    computo.on("message", (obj)=>{
+        res.json(obj);
+    })
+    
+    
+});
 
 module.exports = router;

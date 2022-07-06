@@ -1,3 +1,5 @@
+//inicializamos node con : node app.js --PORT 8081
+
 const express = require("express");
 const {Server: HttpServer } = require("http");
 const {Server: IOServer } = require("socket.io");
@@ -9,6 +11,7 @@ const mongoose = require('mongoose');
 // let {MongoUser} = require("./src/contenedores/mongoUser");
 let Contenedor = require("./src/contenedores/contenedor");
 let Chat = require("./src/contenedores/chat");
+let configuracion = require("./src/config/config");
 // const {products} = require("./src/faker");
 
 const router = require("./src/routes/router");
@@ -16,14 +19,14 @@ const router = require("./src/routes/router");
 const app = express();
 const httpServer = new HttpServer(app);
 const io = new IOServer(httpServer);
-const PORT = 8080;
+const PORT = configuracion.PORT;
 // const mongoUser = new MongoUser();
 
 
 const archivo = new Contenedor("./db/productos.json");
 const mensajes = new Chat("./db/mensajes.json");
 
-const MONGO_URL = "mongodb://localhost/sesiones";
+const MONGO_URL = configuracion.MONGO_URL;
 
 //mongod -dbpath "rutaDBMongo"  ... Recordar para abrir la base de datos
 mongoose.connect(MONGO_URL,{
@@ -64,10 +67,28 @@ app.engine(
 app.set("view engine", "hbs");
 app.set("views", "./views");
 
+app.get("/info", (req,res)=>{
+    let argumentos = process.argv.slice(2).join(" ");
+    let so = process.platform;
+    let node = process.version;
+    let memory = process.memoryUsage();
+    let pathEj = process.title;
+    let processId = process.pid;
+    let carpeta = process.cwd();
+    res.render("info", {
+        argumentos,
+        so,
+        node,
+        memory,
+        pathEj,
+        processId,
+        carpeta
+    })
+});
 
 
 httpServer.listen(PORT, ()=>{
-    console.log("Server ON in http://localhost:"+httpServer.address().port)
+    console.log("Server ON in http://localhost:"+httpServer.address().port);
 })
 io.on("connection", async (socket)=>{
     console.log("Cliente conectado");
@@ -78,12 +99,12 @@ io.on("connection", async (socket)=>{
     socket.on("producto-nuevo", async data =>{
         archivo.save(data);
         io.sockets.emit("productos", await archivo.getAll());
-    })
+    });
 
     socket.on("mensaje-nuevo", async data =>{
         mensajes.save(data);
         io.sockets.emit("mensajes", await mensajes.getAll());
-    })
+    });
 })
 
 
