@@ -7,6 +7,7 @@ const handlebars = require("express-handlebars");
 const session = require("express-session");
 const MongoStore = require("connect-mongo");
 const mongoose = require('mongoose');
+const procesadores = require("os").cpus().length
 
 // let {MongoUser} = require("./src/contenedores/mongoUser");
 let Contenedor = require("./src/contenedores/contenedor");
@@ -82,9 +83,11 @@ app.get("/info", (req,res)=>{
         memory,
         pathEj,
         processId,
-        carpeta
+        carpeta,
+        procesadores
     })
 });
+
 
 
 httpServer.listen(PORT, ()=>{

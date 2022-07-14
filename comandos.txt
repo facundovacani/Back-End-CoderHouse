@@ -1,0 +1,10 @@
+forever start app.js 8081
+forever start app.js 8082
+forever stopall
+
+
+pm2 start app.js -- --watch -- 8081
+pm2 start app.js --name="2" --watch -i max -- 8082
+
+pm2 stop "all"
+pm2 delete "all"
