@@ -2,6 +2,9 @@ const procesadores = require("os").cpus().length
 const cluster = require("cluster");
 const modoCluster = process.argv[3] == 'CLUSTER';
 
+const compression = require("compression");
+
+
 if(modoCluster && cluster.isPrimary){
     for(let i=0; i<numCPUs; i++) {
         cluster.fork()
@@ -13,6 +16,8 @@ if(modoCluster && cluster.isPrimary){
     })
 }else {
     const app = express()
+    app.use(compression());
+
 
     const PORT = parseInt(process.argv[2]) || 8080
 

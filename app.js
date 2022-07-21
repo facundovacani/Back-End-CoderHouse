@@ -8,6 +8,7 @@ const session = require("express-session");
 const MongoStore = require("connect-mongo");
 const mongoose = require('mongoose');
 const procesadores = require("os").cpus().length
+const compression = require("compression");
 
 // let {MongoUser} = require("./src/contenedores/mongoUser");
 let Contenedor = require("./src/contenedores/contenedor");
@@ -18,6 +19,8 @@ let configuracion = require("./src/config/config");
 const router = require("./src/routes/router");
 
 const app = express();
+app.use(compression());
+
 const httpServer = new HttpServer(app);
 const io = new IOServer(httpServer);
 const PORT = configuracion.PORT;
